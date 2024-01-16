@@ -7,12 +7,11 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Core.Specifications;
 using API.Dtos;
 using AutoMapper;
+using API.Errors;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
         private readonly IGenericRepository<Product> productRepo;
         private readonly IGenericRepository<ProductBrand> brandRepo;
@@ -43,6 +42,9 @@ namespace API.Controllers
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
             var product = await productRepo.GetEntityWithspec(spec);
+
+            if (product == null) return NotFound(new ApiResponse(404));
+
             return mapper.Map<Product, ProductToReturnDto>(product);
         }
 
